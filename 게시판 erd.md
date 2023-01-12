@@ -46,10 +46,24 @@ erDiagram
 		timestamp updateAt "게시물이 업데이트 된 시간"
 	}
 	
+	POST_HIERARCHY {
+		bigserial postHierarchyNo PK "계층 번호"
+		bigint parentNo FK "부모 게시물 번호"
+		bigint childNo FK "자식 게시물 번호"
+	}
+	
 	POST_LINE {
-		bigint seq "순서"
+		bigint postNo PK
+		bigint seq PK "순서"
 		varchar type "게시물 타입"
-		varchar content "게시물 내용"
+		jsonb content "게시물 내용"
+		jsonb attribute "댓글 색깔 등이 저장되는 곳"
+	}
+	
+	POST_LINE_HIERARCHY {
+		bigint postNo PK
+		bigint parentSeq PK
+		bigint childSeq PK
 	}
 	
 	POST_FILE {
@@ -57,6 +71,19 @@ erDiagram
 		varchar fileName "게시물 파일 이름"
 		varchar filePath "게시물 저장 위치"
 		varchar thumbnailUrl "썸네일 url"
+	}
+	
+	POST_COMMENT {
+		bigint commentNo PK "댓글 번호"
+		bigint postNo FK "게시물 번호"
+		bigint fileNo FK "파일 번호"
+		varchar comment "댓글 내용"
+	}
+	
+	POST_COMMENT_HIERARCHY {
+		bigint postNo PK
+		bigint parentNo FK
+		bigint childNo FK
 	}
 	
 	USER_POST_ROLE {
@@ -101,6 +128,13 @@ erDiagram
 	
 	POST ||..|| POST_FILE : thumbnail
 	POST_LINE ||..|| POST_FILE : image-video
+	
+	POST ||..|{ POST_COMMENT : comment
+	POST_COMMENT ||..|{ POST_FILE : upload
+	
+	POST_HIERARCHY ||--|| POST : parentandchild
+	POST_LINE ||--|| POST_LINE_HIERARCHY : parentandchild
+	POST_COMMENT ||--|| POST_COMMENT_HIERARCHY : parentandchild
 	
 ```
 
